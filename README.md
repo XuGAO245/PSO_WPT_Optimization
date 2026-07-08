@@ -60,7 +60,7 @@ run PSO_Main.m
 
 🛠️ 自定义配置
 
-如果你想将此算法移植到你自己的 Simulink 模型中，只需在 PSO_Main.m 中修改以下参数：
+如果你想将此算法移植到你自己的 Simulink 模型中，只需在 PSO.m 中修改以下参数：
 
 mdl：更改为你的 Simulink 模型名称。
 

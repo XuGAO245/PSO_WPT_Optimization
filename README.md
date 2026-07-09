@@ -42,7 +42,7 @@ WPT-PSO-PI-Optimization/
 
 1. 环境依赖
 
-MATLAB (建议版本 R2020a 及以上)
+MATLAB (建议版本 R2024a 及以上)
 
 Simulink (用于运行 WPT 系统仿真模型)
 

@@ -151,8 +151,59 @@ for kk = 1:run_times
     end
 end
 
-%% 输出最终最优结果
+%% 输出最终最优结果并自动绘制对比图
 disp(['[kp, ki]=[', num2str(GBest(1)), ' ,', num2str(GBest(2)), ']']);
+
+disp('正在自动运行对照仿真并生成优化前后对比图...');
+
+% 1. 配置传统经验控制参数并运行仿真，保存数据
+kp_old = 1.0; 
+ki_old = 1.0; % 对照组参数可根据实际情况修改
+set_param([mdl '/Kp'], 'Value', num2str(kp_old));
+set_param([mdl '/Ki'], 'Value', num2str(ki_old));
+sim(mdl);
+t_old = Vout.time(:, 1);
+vol_old = Vout.signals.values(:, 1);
+
+% 2. 重新配置优化后的最佳参数运行仿真，保存数据
+set_param([mdl '/Kp'], 'Value', num2str(GBest(1)));
+set_param([mdl '/Ki'], 'Value', num2str(GBest(2)));
+sim(mdl);
+t_new = Vout.time(:, 1);
+vol_new = Vout.signals.values(:, 1);
+
+% 3. 自动绘制响应曲线对比图
+figure('Color', [1 1 1]);           
+hold on;
+
+% 绘制参考电压基准线
+yline(Vref, 'm--', 'LineWidth', 1.2);
+
+% 绘制双组对比波形
+plot(t_new, vol_new, 'b-', 'LineWidth', 2.0);   % 优化后：蓝色加粗
+plot(t_old, vol_old, 'r-', 'LineWidth', 1.5);   % 优化前：红色
+
+% 坐标轴与网格精美格式配置
+xlim([0 0.05]);
+ylim([0 1.4]);
+box on;                             
+grid on;                            
+ax = gca;
+ax.GridLineStyle = ':';            
+ax.GridAlpha = 0.5;                
+
+% 轴标签与标题
+xlabel('时间 (s)', 'FontName', '宋体', 'FontSize', 11);
+ylabel('输出电压 (V)', 'FontName', '宋体', 'FontSize', 11);
+title('WPT系统输出电压对比图 (PSO优化前后)', 'FontName', '宋体', 'FontSize', 13, 'FontWeight', 'bold');
+
+% 动态组装图例参数
+lgd_str1 = sprintf('优化后：[K_p, K_i] = [%.3f, %.3f]', GBest(1), GBest(2));
+lgd_str2 = sprintf('优化前：[K_p, K_i] = [%.1f, %.1f]', kp_old, ki_old);
+legend('参考电压', lgd_str1, lgd_str2, 'FontName', '宋体', 'FontSize', 10, 'Location', 'southeast');
+
+hold off;
+disp('性能对比图生成完毕！');
 
 
 % =========================================================================
